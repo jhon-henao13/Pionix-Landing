@@ -1,12 +1,13 @@
-// Variables globales
-let currentSlide = 0;
-const slides = document.querySelectorAll('.testimonial-card');
-const dots = document.querySelectorAll('.dot');
+// Variables globales para sliders
+
+// Variables para el slider de Misión y Visión
+let currentSlideMisionVision = 0;
 
 // Inicialización cuando el DOM esté listo
 document.addEventListener('DOMContentLoaded', function() {
     initializeNavigation();
-    initializeTestimonialSlider();
+    
+    initializeMisionVisionSlider();  // Inicializar el slider de Misión y Visión
     initializeScrollAnimations();
     initializeSmoothScrolling();
     initializeParallaxEffects();
@@ -16,14 +17,13 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeTextEffects();
 });
 
-// Navegación móvil mejorada
+// Función para inicializar la navegación móvil
 function initializeNavigation() {
     const navToggle = document.getElementById('nav-toggle');
     const navMenu = document.getElementById('nav-menu');
     const navLinks = document.querySelectorAll('.nav-link');
     const navbar = document.querySelector('.navbar');
 
-    // Toggle del menú móvil
     navToggle.addEventListener('click', function() {
         navToggle.classList.toggle('active');
         navMenu.classList.toggle('active');
@@ -36,7 +36,6 @@ function initializeNavigation() {
         }
     });
 
-    // Cerrar menú al hacer clic en un enlace
     navLinks.forEach(link => {
         link.addEventListener('click', function() {
             navToggle.classList.remove('active');
@@ -45,7 +44,6 @@ function initializeNavigation() {
         });
     });
 
-    // Cambiar navbar al hacer scroll con efectos mejorados
     let lastScrollY = window.scrollY;
     window.addEventListener('scroll', function() {
         const currentScrollY = window.scrollY;
@@ -60,7 +58,6 @@ function initializeNavigation() {
             navbar.style.backdropFilter = 'blur(20px)';
         }
 
-        // Efecto de ocultar/mostrar navbar
         if (currentScrollY > lastScrollY && currentScrollY > 200) {
             navbar.style.transform = 'translateY(-100%)';
         } else {
@@ -71,62 +68,62 @@ function initializeNavigation() {
     });
 }
 
-// Slider de testimonios mejorado
-function initializeTestimonialSlider() {
-    if (slides.length === 0) return;
+// Slider de Misión y Visión
+function initializeMisionVisionSlider() {
+    const slidesMisionVision = document.querySelectorAll('.mision-vision-card');
+    const dotsMisionVision = document.querySelectorAll('.dot-mision-vision');
 
-    // Mostrar el primer slide
-    showSlide(0);
+    if (slidesMisionVision.length === 0) return;
 
-    // Event listeners para los dots
-    dots.forEach((dot, index) => {
+
+     // Mostrar el primer slide de Misión y Visión
+    showSlideMisionVision(0, slidesMisionVision, dotsMisionVision);
+
+    
+    // Event listeners para los dots de Misión y Visión
+    dotsMisionVision.forEach((dot, index) => {
         dot.addEventListener('click', function() {
-            showSlide(index);
+            showSlideMisionVision(index, slidesMisionVision, dotsMisionVision);
         });
     });
 
-    // Auto-play del slider con pausa en hover
-    let autoPlayInterval = setInterval(function() {
-        currentSlide = (currentSlide + 1) % slides.length;
-        showSlide(currentSlide);
+    // Auto-play del slider de Misión y Visión con pausa en hover
+    let autoPlayIntervalMisionVision = setInterval(function() {
+        currentSlideMisionVision = (currentSlideMisionVision + 1) % slidesMisionVision.length;
+        showSlideMisionVision(currentSlideMisionVision, slidesMisionVision, dotsMisionVision);
     }, 6000);
 
-    // Pausar en hover
-    const sliderContainer = document.querySelector('.testimonials-slider');
-    if (sliderContainer) {
-        sliderContainer.addEventListener('mouseenter', () => clearInterval(autoPlayInterval));
-        sliderContainer.addEventListener('mouseleave', () => {
-            autoPlayInterval = setInterval(function() {
-                currentSlide = (currentSlide + 1) % slides.length;
-                showSlide(currentSlide);
+    const sliderContainerMisionVision = document.querySelector('.mision-vision-slider');
+    if (sliderContainerMisionVision) {
+        sliderContainerMisionVision.addEventListener('mouseenter', () => clearInterval(autoPlayIntervalMisionVision));
+        sliderContainerMisionVision.addEventListener('mouseleave', () => {
+            autoPlayIntervalMisionVision = setInterval(function() {
+                currentSlideMisionVision = (currentSlideMisionVision + 1) % slidesMisionVision.length;
+                showSlideMisionVision(currentSlideMisionVision, slidesMisionVision, dotsMisionVision);
             }, 6000);
         });
     }
 }
 
-function showSlide(index) {
-    // Ocultar todos los slides con animación
-    slides.forEach(slide => {
+// Función para mostrar el slide actual de Misión y Visión
+function showSlideMisionVision(index, slidesMisionVision, dotsMisionVision) {
+    slidesMisionVision.forEach(slide => {
         slide.style.opacity = '0';
-        slide.style.transform = 'translateY(20px)';
         slide.classList.remove('active');
     });
 
-    // Remover clase active de todos los dots
-    dots.forEach(dot => {
+    dotsMisionVision.forEach(dot => {
         dot.classList.remove('active');
     });
 
-    // Mostrar el slide actual con animación
     setTimeout(() => {
-        slides[index].classList.add('active');
-        slides[index].style.opacity = '1';
-        slides[index].style.transform = 'translateY(0)';
-        dots[index].classList.add('active');
+        slidesMisionVision[index].classList.add('active');
+        slidesMisionVision[index].style.opacity = '1';
+        dotsMisionVision[index].classList.add('active');
     }, 300);
-    
-    currentSlide = index;
+    currentSlideMisionVision = index;
 }
+
 
 // Animaciones de scroll mejoradas
 function initializeScrollAnimations() {
@@ -612,16 +609,7 @@ function optimizeScrollPerformance() {
 }
 
 
-// Splash loader
-window.addEventListener("load", () => {
-  const splash = document.getElementById("splash-loader");
 
-  setTimeout(() => {
-    splash.style.opacity = 0;
-    splash.style.visibility = "hidden";
-    splash.style.display = "none"; // opcional: elimina del flujo
-  }, 3000); // Tiempo total: 3 segundos
-});
 
 
 
@@ -662,3 +650,27 @@ dynamicStyles.textContent = `
     }
 `;
 document.head.appendChild(dynamicStyles);
+
+
+// Función para ocultar el splash loader una vez cargada la página
+window.addEventListener('load', function() {
+    setTimeout(function() {
+        const splashLoader = document.getElementById('splash-loader');
+        if (splashLoader) {
+            splashLoader.classList.add('hidden');  // Añadimos una clase para ocultarlo suavemente
+        }
+    }, 1100);  // Espera un poco más para que se vea el logo y el texto
+});
+
+// Hacer que el logo sea interactivo al hacer clic
+document.querySelector('.splash-logo').addEventListener('click', function() {
+    const logo = this;
+    logo.style.transition = "transform 0.5s ease, filter 0.5s ease"; // Añadimos transición para hacer el efecto más suave
+    logo.style.transform = 'scale(1.2)';
+    logo.style.filter = 'drop-shadow(0 0 25px #8A2BE2)';  // Resplandor más fuerte al hacer clic
+    
+    setTimeout(function() {
+        logo.style.transform = '';  // Regresar al tamaño original
+        logo.style.filter = '';  // Restablecer el resplandor
+    }, 500);
+});
