@@ -10,18 +10,30 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeScrollAnimations();
     initializeSmoothScrolling();
     initializeParallaxEffects();
+    initializeAdvancedEffects();
+    initializeParticleSystem();
+    initializeLogoAnimations();
+    initializeTextEffects();
 });
 
-// Navegación móvil
+// Navegación móvil mejorada
 function initializeNavigation() {
     const navToggle = document.getElementById('nav-toggle');
     const navMenu = document.getElementById('nav-menu');
     const navLinks = document.querySelectorAll('.nav-link');
+    const navbar = document.querySelector('.navbar');
 
     // Toggle del menú móvil
     navToggle.addEventListener('click', function() {
         navToggle.classList.toggle('active');
         navMenu.classList.toggle('active');
+        
+        // Efecto de blur en el fondo
+        if (navMenu.classList.contains('active')) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'auto';
+        }
     });
 
     // Cerrar menú al hacer clic en un enlace
@@ -29,23 +41,37 @@ function initializeNavigation() {
         link.addEventListener('click', function() {
             navToggle.classList.remove('active');
             navMenu.classList.remove('active');
+            document.body.style.overflow = 'auto';
         });
     });
 
-    // Cambiar navbar al hacer scroll
+    // Cambiar navbar al hacer scroll con efectos mejorados
+    let lastScrollY = window.scrollY;
     window.addEventListener('scroll', function() {
-        const navbar = document.querySelector('.navbar');
-        if (window.scrollY > 100) {
-            navbar.style.background = 'rgba(0, 0, 0, 0.98)';
-            navbar.style.boxShadow = '0 2px 20px rgba(0, 255, 255, 0.1)';
+        const currentScrollY = window.scrollY;
+        
+        if (currentScrollY > 100) {
+            navbar.style.background = 'linear-gradient(180deg, rgba(0, 0, 0, 0.98) 0%, rgba(0, 0, 0, 0.95) 100%)';
+            navbar.style.boxShadow = '0 8px 30px rgba(0, 255, 255, 0.15)';
+            navbar.style.backdropFilter = 'blur(25px)';
         } else {
-            navbar.style.background = 'rgba(0, 0, 0, 0.95)';
-            navbar.style.boxShadow = 'none';
+            navbar.style.background = 'linear-gradient(180deg, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.8) 100%)';
+            navbar.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.3)';
+            navbar.style.backdropFilter = 'blur(20px)';
         }
+
+        // Efecto de ocultar/mostrar navbar
+        if (currentScrollY > lastScrollY && currentScrollY > 200) {
+            navbar.style.transform = 'translateY(-100%)';
+        } else {
+            navbar.style.transform = 'translateY(0)';
+        }
+        
+        lastScrollY = currentScrollY;
     });
 }
 
-// Slider de testimonios
+// Slider de testimonios mejorado
 function initializeTestimonialSlider() {
     if (slides.length === 0) return;
 
@@ -59,16 +85,30 @@ function initializeTestimonialSlider() {
         });
     });
 
-    // Auto-play del slider
-    setInterval(function() {
+    // Auto-play del slider con pausa en hover
+    let autoPlayInterval = setInterval(function() {
         currentSlide = (currentSlide + 1) % slides.length;
         showSlide(currentSlide);
-    }, 5000);
+    }, 6000);
+
+    // Pausar en hover
+    const sliderContainer = document.querySelector('.testimonials-slider');
+    if (sliderContainer) {
+        sliderContainer.addEventListener('mouseenter', () => clearInterval(autoPlayInterval));
+        sliderContainer.addEventListener('mouseleave', () => {
+            autoPlayInterval = setInterval(function() {
+                currentSlide = (currentSlide + 1) % slides.length;
+                showSlide(currentSlide);
+            }, 6000);
+        });
+    }
 }
 
 function showSlide(index) {
-    // Ocultar todos los slides
+    // Ocultar todos los slides con animación
     slides.forEach(slide => {
+        slide.style.opacity = '0';
+        slide.style.transform = 'translateY(20px)';
         slide.classList.remove('active');
     });
 
@@ -77,14 +117,18 @@ function showSlide(index) {
         dot.classList.remove('active');
     });
 
-    // Mostrar el slide actual
-    slides[index].classList.add('active');
-    dots[index].classList.add('active');
+    // Mostrar el slide actual con animación
+    setTimeout(() => {
+        slides[index].classList.add('active');
+        slides[index].style.opacity = '1';
+        slides[index].style.transform = 'translateY(0)';
+        dots[index].classList.add('active');
+    }, 300);
     
     currentSlide = index;
 }
 
-// Animaciones de scroll
+// Animaciones de scroll mejoradas
 function initializeScrollAnimations() {
     const observerOptions = {
         threshold: 0.1,
@@ -95,6 +139,12 @@ function initializeScrollAnimations() {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 entry.target.classList.add('aos-animate');
+                
+                // Efecto de contador para números
+                if (entry.target.classList.contains('benefit-number')) {
+                    const target = parseInt(entry.target.textContent);
+                    animateCounter(entry.target, target, 2000);
+                }
             }
         });
     }, observerOptions);
@@ -106,7 +156,7 @@ function initializeScrollAnimations() {
     });
 }
 
-// Scroll suave para enlaces internos
+// Scroll suave mejorado
 function initializeSmoothScrolling() {
     const internalLinks = document.querySelectorAll('a[href^="#"]');
     
@@ -118,102 +168,265 @@ function initializeSmoothScrolling() {
             const targetElement = document.querySelector(targetId);
             
             if (targetElement) {
-                const offsetTop = targetElement.offsetTop - 80; // Ajuste para navbar fijo
+                const offsetTop = targetElement.offsetTop - 80;
                 
                 window.scrollTo({
                     top: offsetTop,
                     behavior: 'smooth'
                 });
+                
+                // Efecto de highlight en el elemento objetivo
+                targetElement.style.boxShadow = '0 0 30px rgba(0, 255, 255, 0.5)';
+                setTimeout(() => {
+                    targetElement.style.boxShadow = '';
+                }, 2000);
             }
         });
     });
 }
 
-// Efectos parallax
+// Efectos parallax mejorados
 function initializeParallaxEffects() {
-    window.addEventListener('scroll', function() {
+    let ticking = false;
+    
+    function updateParallax() {
         const scrolled = window.pageYOffset;
         const parallaxElements = document.querySelectorAll('.hero-glow-1, .hero-glow-2, .hero-glow-3');
         
         parallaxElements.forEach((element, index) => {
-            const speed = 0.5 + (index * 0.1);
+            const speed = 0.3 + (index * 0.1);
             const yPos = -(scrolled * speed);
-            element.style.transform = `translateY(${yPos}px)`;
+            const xPos = (scrolled * 0.1) * (index % 2 === 0 ? 1 : -1);
+            element.style.transform = `translate(${xPos}px, ${yPos}px)`;
         });
-    });
+        
+        ticking = false;
+    }
+    
+    function requestTick() {
+        if (!ticking) {
+            requestAnimationFrame(updateParallax);
+            ticking = true;
+        }
+    }
+    
+    window.addEventListener('scroll', requestTick);
 }
 
-// Efectos de hover para botones CTA
-document.addEventListener('DOMContentLoaded', function() {
+// Efectos avanzados
+function initializeAdvancedEffects() {
+    // Efectos de hover mejorados para botones CTA
     const ctaButtons = document.querySelectorAll('.cta-button');
     
     ctaButtons.forEach(button => {
         button.addEventListener('mouseenter', function() {
-            this.style.transform = 'translateY(-3px) scale(1.02)';
+            this.style.transform = 'translateY(-8px) scale(1.05)';
+            this.style.boxShadow = '0 20px 50px rgba(0, 255, 255, 0.8)';
         });
         
         button.addEventListener('mouseleave', function() {
             this.style.transform = 'translateY(0) scale(1)';
+            this.style.boxShadow = '';
         });
     });
-});
 
-// Efectos de hover para tarjetas de servicios
-document.addEventListener('DOMContentLoaded', function() {
+    // Efectos de hover para tarjetas de servicios
     const serviceCards = document.querySelectorAll('.service-card');
     
     serviceCards.forEach(card => {
         card.addEventListener('mouseenter', function() {
-            this.style.transform = 'translateY(-10px) scale(1.02)';
+            this.style.transform = 'translateY(-15px) scale(1.03)';
+            this.style.boxShadow = '0 25px 50px rgba(0, 255, 255, 0.4)';
         });
         
         card.addEventListener('mouseleave', function() {
             this.style.transform = 'translateY(0) scale(1)';
+            this.style.boxShadow = '';
         });
     });
-});
 
-// Efectos de hover para elementos de beneficios
-document.addEventListener('DOMContentLoaded', function() {
+    // Efectos de hover para elementos de beneficios
     const benefitItems = document.querySelectorAll('.benefit-item');
     
     benefitItems.forEach(item => {
         item.addEventListener('mouseenter', function() {
-            this.style.transform = 'translateX(10px)';
+            this.style.transform = 'translateX(15px) scale(1.02)';
+            this.style.boxShadow = '0 15px 30px rgba(0, 255, 255, 0.3)';
         });
         
         item.addEventListener('mouseleave', function() {
-            this.style.transform = 'translateX(0)';
+            this.style.transform = 'translateX(0) scale(1)';
+            this.style.boxShadow = '';
         });
     });
-});
+}
 
-// Animación de contador para números
-function animateCounter(element, target, duration = 2000) {
+// Sistema de partículas avanzado
+function initializeParticleSystem() {
+    const hero = document.querySelector('.hero');
+    if (!hero) return;
+    
+    // Crear partículas dinámicas
+    for (let i = 0; i < 30; i++) {
+        createParticle(hero, i);
+    }
+}
+
+function createParticle(container, index) {
+    const particle = document.createElement('div');
+    particle.className = 'dynamic-particle';
+    
+    const size = Math.random() * 4 + 2;
+    const duration = Math.random() * 10 + 10;
+    const delay = Math.random() * 5;
+    
+    particle.style.cssText = `
+        position: absolute;
+        width: ${size}px;
+        height: ${size}px;
+        background: ${index % 3 === 0 ? 'rgba(0, 255, 255, 0.8)' : 
+                    index % 3 === 1 ? 'rgba(0, 0, 255, 0.6)' : 
+                    'rgba(138, 43, 226, 0.7)'};
+        border-radius: 50%;
+        pointer-events: none;
+        animation: particleFloat ${duration}s ease-in-out infinite;
+        animation-delay: ${delay}s;
+        left: ${Math.random() * 100}%;
+        top: ${Math.random() * 100}%;
+        z-index: 1;
+    `;
+    
+    container.appendChild(particle);
+}
+
+// Animaciones del logo mejoradas
+function initializeLogoAnimations() {
+    const heroLogo = document.querySelector('.hero-logo');
+    if (!heroLogo) return;
+    
+    // Efecto de rotación suave en hover
+    heroLogo.addEventListener('mouseenter', function() {
+        this.style.animation = 'logoGlow 2s ease-in-out infinite alternate, logoRotate 3s linear infinite';
+    });
+    
+    heroLogo.addEventListener('mouseleave', function() {
+        this.style.animation = 'logoGlow 4s ease-in-out infinite alternate';
+    });
+    
+    // Efecto de click
+    heroLogo.addEventListener('click', function() {
+        this.style.transform = 'scale(1.2) rotate(360deg)';
+        setTimeout(() => {
+            this.style.transform = '';
+        }, 600);
+    });
+}
+
+// Efectos de texto avanzados
+function initializeTextEffects() {
+    const heroTitle = document.querySelector('.hero-title-main');
+    if (heroTitle) {
+        // Efecto de typing mejorado
+        const originalText = heroTitle.textContent;
+        typeWriterAdvanced(heroTitle, originalText, 100);
+    }
+    
+    // Efecto de revelación de texto
+    const descriptions = document.querySelectorAll('.hero-description, .section-subtitle');
+    descriptions.forEach(desc => {
+        desc.style.opacity = '0';
+        desc.style.transform = 'translateY(30px)';
+        
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.transition = 'all 1s ease';
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        });
+        
+        observer.observe(desc);
+    });
+
+    // Animación de estadísticas del hero
+    initializeHeroStats();
+}
+
+// Animación de estadísticas del hero
+function initializeHeroStats() {
+    const statNumbers = document.querySelectorAll('.stat-number');
+    
+    const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const target = entry.target.textContent;
+                const isPercentage = target.includes('%');
+                const isPlus = target.includes('+');
+                
+                let numericValue = parseInt(target.replace(/[^\d]/g, ''));
+                
+                animateStatCounter(entry.target, numericValue, isPercentage, isPlus);
+            }
+        });
+    });
+    
+    statNumbers.forEach(stat => observer.observe(stat));
+}
+
+function animateStatCounter(element, target, isPercentage, isPlus) {
     let start = 0;
+    const duration = 2000;
     const increment = target / (duration / 16);
     
     function updateCounter() {
         start += increment;
         if (start < target) {
-            element.textContent = Math.floor(start);
+            let displayValue = Math.floor(start);
+            if (isPercentage) {
+                element.textContent = displayValue + '%';
+            } else if (isPlus) {
+                element.textContent = displayValue + '+';
+            } else {
+                element.textContent = displayValue + '+';
+            }
             requestAnimationFrame(updateCounter);
         } else {
-            element.textContent = target;
+            if (isPercentage) {
+                element.textContent = target + '%';
+            } else if (isPlus) {
+                element.textContent = target + '+';
+            } else {
+                element.textContent = target + '+';
+            }
         }
     }
     
     updateCounter();
 }
 
-// Efectos de typing para el título principal
-function typeWriter(element, text, speed = 100) {
+// Typing avanzado con efectos
+function typeWriterAdvanced(element, text, speed) {
     let i = 0;
     element.innerHTML = '';
     
     function type() {
         if (i < text.length) {
-            element.innerHTML += text.charAt(i);
+            const char = text.charAt(i);
+            const span = document.createElement('span');
+            span.textContent = char;
+            span.style.opacity = '0';
+            span.style.transform = 'translateY(20px)';
+            span.style.transition = 'all 0.1s ease';
+            
+            element.appendChild(span);
+            
+            setTimeout(() => {
+                span.style.opacity = '1';
+                span.style.transform = 'translateY(0)';
+            }, 50);
+            
             i++;
             setTimeout(type, speed);
         }
@@ -222,61 +435,25 @@ function typeWriter(element, text, speed = 100) {
     type();
 }
 
-// Inicializar efectos de typing cuando la página cargue
-document.addEventListener('DOMContentLoaded', function() {
-    const heroTitle = document.querySelector('.hero-title-main');
-    if (heroTitle) {
-        const originalText = heroTitle.textContent;
-        typeWriter(heroTitle, originalText, 150);
-    }
-});
-
-// Efectos de partículas flotantes
-function createFloatingParticles() {
-    const hero = document.querySelector('.hero');
-    if (!hero) return;
+// Animación de contador mejorada
+function animateCounter(element, target, duration = 2000) {
+    let start = 0;
+    const increment = target / (duration / 16);
     
-    for (let i = 0; i < 20; i++) {
-        const particle = document.createElement('div');
-        particle.className = 'floating-particle';
-        particle.style.cssText = `
-            position: absolute;
-            width: 4px;
-            height: 4px;
-            background: rgba(0, 255, 255, 0.6);
-            border-radius: 50%;
-            pointer-events: none;
-            animation: float-particle ${3 + Math.random() * 4}s ease-in-out infinite;
-            left: ${Math.random() * 100}%;
-            top: ${Math.random() * 100}%;
-        `;
-        
-        hero.appendChild(particle);
+    function updateCounter() {
+        start += increment;
+        if (start < target) {
+            element.textContent = Math.floor(start).toString().padStart(2, '0');
+            requestAnimationFrame(updateCounter);
+        } else {
+            element.textContent = target.toString().padStart(2, '0');
+        }
     }
+    
+    updateCounter();
 }
 
-// Agregar estilos CSS para las partículas
-const particleStyles = document.createElement('style');
-particleStyles.textContent = `
-    @keyframes float-particle {
-        0%, 100% { 
-            transform: translateY(0px) translateX(0px);
-            opacity: 0.6;
-        }
-        50% { 
-            transform: translateY(-20px) translateX(10px);
-            opacity: 1;
-        }
-    }
-`;
-document.head.appendChild(particleStyles);
-
-// Inicializar partículas cuando la página cargue
-document.addEventListener('DOMContentLoaded', function() {
-    createFloatingParticles();
-});
-
-// Efectos de carga progresiva
+// Efectos de carga progresiva mejorados
 function initializeProgressiveLoading() {
     const images = document.querySelectorAll('img');
     
@@ -284,20 +461,17 @@ function initializeProgressiveLoading() {
         img.addEventListener('load', function() {
             this.style.opacity = '1';
             this.style.transform = 'scale(1)';
+            this.style.filter = 'brightness(1)';
         });
         
         img.style.opacity = '0';
         img.style.transform = 'scale(0.9)';
-        img.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+        img.style.filter = 'brightness(0.8)';
+        img.style.transition = 'all 0.8s ease';
     });
 }
 
-// Inicializar carga progresiva
-document.addEventListener('DOMContentLoaded', function() {
-    initializeProgressiveLoading();
-});
-
-// Efectos de scroll para el indicador de scroll
+// Efectos de scroll para el indicador mejorado
 function initializeScrollIndicator() {
     const scrollIndicator = document.querySelector('.scroll-indicator');
     if (!scrollIndicator) return;
@@ -308,7 +482,7 @@ function initializeScrollIndicator() {
         
         if (scrolled > windowHeight * 0.3) {
             scrollIndicator.style.opacity = '0';
-            scrollIndicator.style.transform = 'translateX(-50%) translateY(20px)';
+            scrollIndicator.style.transform = 'translateX(-50%) translateY(30px)';
         } else {
             scrollIndicator.style.opacity = '1';
             scrollIndicator.style.transform = 'translateX(-50%) translateY(0)';
@@ -316,79 +490,78 @@ function initializeScrollIndicator() {
     });
 }
 
-// Inicializar indicador de scroll
-document.addEventListener('DOMContentLoaded', function() {
-    initializeScrollIndicator();
-});
-
-// Efectos de hover para enlaces sociales
-document.addEventListener('DOMContentLoaded', function() {
+// Efectos de hover para enlaces sociales mejorados
+function initializeSocialLinks() {
     const socialLinks = document.querySelectorAll('.social-link');
     
     socialLinks.forEach(link => {
         link.addEventListener('mouseenter', function() {
-            this.style.transform = 'translateY(-3px) rotate(5deg)';
+            this.style.transform = 'translateY(-5px) rotate(10deg) scale(1.1)';
+            this.style.boxShadow = '0 10px 25px rgba(0, 255, 255, 0.5)';
         });
         
         link.addEventListener('mouseleave', function() {
-            this.style.transform = 'translateY(0) rotate(0deg)';
+            this.style.transform = 'translateY(0) rotate(0deg) scale(1)';
+            this.style.boxShadow = '';
         });
     });
-});
+}
 
-// Función para mostrar mensaje de éxito al hacer clic en WhatsApp
+// Función para mostrar mensaje de éxito al hacer clic en WhatsApp mejorada
 function showWhatsAppMessage() {
     const buttons = document.querySelectorAll('a[href*="wa.me"]');
     
     buttons.forEach(button => {
         button.addEventListener('click', function(e) {
-            // Crear notificación temporal
+            // Crear notificación mejorada
             const notification = document.createElement('div');
             notification.style.cssText = `
                 position: fixed;
-                top: 20px;
-                right: 20px;
-                background: linear-gradient(90deg, #00FFFF, #8A2BE2);
+                top: 30px;
+                right: 30px;
+                background: linear-gradient(135deg, #00FFFF, #8A2BE2);
                 color: #000;
-                padding: 15px 25px;
-                border-radius: 10px;
+                padding: 20px 30px;
+                border-radius: 15px;
                 font-weight: 600;
                 z-index: 10000;
-                transform: translateX(100%);
-                transition: transform 0.3s ease;
-                box-shadow: 0 5px 20px rgba(0, 255, 255, 0.3);
+                transform: translateX(100%) scale(0.8);
+                transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+                box-shadow: 0 10px 30px rgba(0, 255, 255, 0.4);
+                border: 2px solid rgba(255, 255, 255, 0.2);
+                backdrop-filter: blur(10px);
             `;
-            notification.textContent = '¡Abriendo WhatsApp...';
+            notification.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <i class="fab fa-whatsapp" style="font-size: 1.2rem;"></i>
+                    <span>¡Abriendo WhatsApp...</span>
+                </div>
+            `;
             
             document.body.appendChild(notification);
             
             // Animar entrada
             setTimeout(() => {
-                notification.style.transform = 'translateX(0)';
+                notification.style.transform = 'translateX(0) scale(1)';
             }, 100);
             
-            // Remover después de 3 segundos
+            // Remover después de 4 segundos
             setTimeout(() => {
-                notification.style.transform = 'translateX(100%)';
+                notification.style.transform = 'translateX(100%) scale(0.8)';
                 setTimeout(() => {
                     document.body.removeChild(notification);
-                }, 300);
-            }, 3000);
+                }, 400);
+            }, 4000);
         });
     });
 }
-
-// Inicializar mensajes de WhatsApp
-document.addEventListener('DOMContentLoaded', function() {
-    showWhatsAppMessage();
-});
 
 // Función para detectar si el dispositivo es móvil
 function isMobile() {
     return window.innerWidth <= 768;
 }
 
-// Ajustar animaciones para móviles
+// Ajustar animaciones para móviles mejorado
 function adjustAnimationsForMobile() {
     if (isMobile()) {
         // Reducir la intensidad de algunas animaciones en móviles
@@ -396,13 +569,16 @@ function adjustAnimationsForMobile() {
         animatedElements.forEach(el => {
             el.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
         });
+        
+        // Reducir el número de partículas en móviles
+        const particles = document.querySelectorAll('.dynamic-particle');
+        particles.forEach((particle, index) => {
+            if (index > 15) {
+                particle.style.display = 'none';
+            }
+        });
     }
 }
-
-// Inicializar ajustes para móviles
-document.addEventListener('DOMContentLoaded', function() {
-    adjustAnimationsForMobile();
-});
 
 // Función para preload de imágenes críticas
 function preloadCriticalImages() {
@@ -415,11 +591,6 @@ function preloadCriticalImages() {
         img.src = src;
     });
 }
-
-// Preload de imágenes críticas
-document.addEventListener('DOMContentLoaded', function() {
-    preloadCriticalImages();
-});
 
 // Función para optimizar performance en scroll
 function optimizeScrollPerformance() {
@@ -440,7 +611,54 @@ function optimizeScrollPerformance() {
     window.addEventListener('scroll', requestTick);
 }
 
-// Inicializar optimización de scroll
+
+// Splash loader
+window.addEventListener("load", () => {
+  const splash = document.getElementById("splash-loader");
+
+  setTimeout(() => {
+    splash.style.opacity = 0;
+    splash.style.visibility = "hidden";
+    splash.style.display = "none"; // opcional: elimina del flujo
+  }, 3000); // Tiempo total: 3 segundos
+});
+
+
+
+
+
+// Inicializar todas las funciones
 document.addEventListener('DOMContentLoaded', function() {
+    initializeProgressiveLoading();
+    initializeScrollIndicator();
+    initializeSocialLinks();
+    showWhatsAppMessage();
+    adjustAnimationsForMobile();
+    preloadCriticalImages();
     optimizeScrollPerformance();
 });
+
+// Agregar estilos CSS dinámicos para partículas
+const dynamicStyles = document.createElement('style');
+dynamicStyles.textContent = `
+    @keyframes particleFloat {
+        0% { 
+            transform: translateY(0px) translateX(0px);
+            opacity: 0.8;
+        }
+        50% { 
+            transform: translateY(-30px) translateX(15px);
+            opacity: 1;
+        }
+        100% { 
+            transform: translateY(-60px) translateX(0px);
+            opacity: 0.3;
+        }
+    }
+    
+    @keyframes logoRotate {
+        0% { transform: scale(1.05) rotate(0deg); }
+        100% { transform: scale(1.05) rotate(360deg); }
+    }
+`;
+document.head.appendChild(dynamicStyles);

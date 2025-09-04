@@ -9,6 +9,17 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
+
+    <!-- Splash Loader -->
+    <div id="splash-loader">
+      <div class="splash-content">
+        <img src="./img/logo.jpeg" alt="Pionix Logo" class="splash-logo" />
+        <p class="splash-text" id="splash-typing"></p>
+      </div>
+    </div>
+
+
+
     <!-- Navigation -->
     <nav class="navbar">
         <div class="nav-container">
@@ -16,13 +27,25 @@
                 <img src="./img/logo.jpeg" alt="Pionix S.A.S" class="nav-logo-img">
                 <span class="nav-logo-text">Pionix</span>
             </div>
+
             <div class="nav-menu" id="nav-menu">
-                <a href="#inicio" class="nav-link">Inicio</a>
-                <a href="#servicios" class="nav-link">Servicios</a>
-                <a href="#beneficios" class="nav-link">Beneficios</a>
-                <a href="#testimonios" class="nav-link">Testimonios</a>
-                <a href="#contacto" class="nav-link">Contacto</a>
+                <a href="#inicio" class="nav-link">
+                    <i class="fas fa-house"></i> Inicio
+                </a>
+                <a href="#servicios" class="nav-link">
+                    <i class="fas fa-cogs"></i> Servicios
+                </a>
+                <a href="#beneficios" class="nav-link">
+                    <i class="fas fa-gem"></i> Beneficios
+                </a>
+                <a href="#testimonios" class="nav-link">
+                    <i class="fas fa-comment-dots"></i> Testimonios
+                </a>
+                <a href="#contacto" class="nav-link">
+                    <i class="fas fa-envelope"></i> Contacto
+                </a>
             </div>
+
             <div class="nav-toggle" id="nav-toggle">
                 <span class="bar"></span>
                 <span class="bar"></span>
@@ -31,22 +54,26 @@
         </div>
     </nav>
 
-    <!-- Hero Section -->
+        <!-- Hero Section -->
     <section id="inicio" class="hero">
         <div class="hero-background">
+            <div class="particles"></div>
             <div class="hero-glow-1"></div>
             <div class="hero-glow-2"></div>
             <div class="hero-glow-3"></div>
         </div>
         <div class="hero-content">
+
             <div class="hero-logo-container">
-                <img src="./img/logo.jpeg" alt="Pionix S.A.S" class="hero-logo">
+                <div class="logo-pulse"></div>
             </div>
+            
+
             <h1 class="hero-title">
-                <span class="hero-title-main">De la Visión</span>
-                <span class="hero-title-sub">al Impacto</span>
+                <span class="hero-title-main shadow-text">De la Visión al</span>
+                <span class="hero-title-sub shadow-text">Impacto</span>
             </h1>
-            <p class="hero-description">
+            <p class="hero-description shadow-text">
                 Transformamos ideas en experiencias inolvidables. Gestión profesional de eventos sociales y corporativos que marcan la diferencia.
             </p>
             <div class="hero-cta">
@@ -63,7 +90,22 @@
         <div class="scroll-indicator">
             <div class="scroll-arrow"></div>
         </div>
+        <div class="hero-stats">
+            <div class="stat-item">
+                <span class="stat-number">100%</span>
+                <span class="stat-label">Eventos Exitosos</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">100%</span>
+                <span class="stat-label">Logistica y mantenimiento 💻</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">100%</span>
+                <span class="stat-label">Soporte Técnico</span>
+            </div>
+        </div>
     </section>
+
 
     <!-- Servicios Section -->
     <section id="servicios" class="services">
