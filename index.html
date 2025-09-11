@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pionix S.A.S - De la Visión al Impacto</title>
     <link rel="stylesheet" href="style.css">
-    <script src="script.js"></script>
+    
+    <script src="script.js" defer></script>
+
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="icon" href="./img/logo.jpeg" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -319,6 +321,67 @@
         </div>
     </section>
 
+    <!-- ...antes de la sección de contacto... -->
+    <section id="agenda" class="agenda">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title">Agenda tu Evento o Cita</h2>
+          <p class="section-subtitle">Selecciona la fecha y hora para reservar tu espacio con Pionix</p>
+        </div>
+        <form id="agenda-form" class="agenda-form">
+          <div class="agenda-fields">
+            <div>
+              <label for="agenda-servicio">Servicio</label>
+              <select id="agenda-servicio" required>
+                <option value="">Selecciona un servicio</option>
+                <option value="Evento Social">Evento Social</option>
+                <option value="Evento Corporativo">Evento Corporativo</option>
+                <option value="Soporte Técnico">Soporte Técnico</option>
+              </select>
+            </div>
+            <div>
+              <label for="agenda-fecha">Fecha</label>
+              <input type="date" id="agenda-fecha" min="" required>
+            </div>
+            <div>
+              <label for="agenda-hora">Hora</label>
+              <select id="agenda-hora" required>
+                <option value="">Selecciona una hora</option>
+                <!-- Opciones generadas por JS -->
+              </select>
+            </div>
+
+            
+
+
+            <div>
+              <label for="agenda-nombre">Nombre</label>
+              <input type="text" id="agenda-nombre" placeholder="Tu nombre" required>
+            </div>
+            <div>
+              <label for="agenda-contacto">Contacto</label>
+              <input type="text" id="agenda-contacto" placeholder="WhatsApp o Email" required>
+            </div>
+
+            <!-- ...dentro de tu <form id="agenda-form">... -->
+            <div>
+              <label for="agenda-metodo">¿Cómo prefieres ser contactado?</label>
+              <select id="agenda-metodo" required>
+                <option value="">Selecciona un método</option>
+                <option value="whatsapp">WhatsApp</option>
+                <option value="email">Email</option>
+              </select>
+            </div>
+
+          </div>
+          <button type="submit" class="cta-button primary large" style="margin-top:2rem;">Reservar</button>
+          <div id="agenda-msg" class="agenda-msg"></div>
+        </form>
+      </div>
+    </section>
+
+
+
     <!-- Contacto Section -->
     <section id="contacto" class="contact">
         <div class="container">
@@ -419,6 +482,8 @@
             </div>
         </div>
     </footer>
+
+
 
     
 </body>

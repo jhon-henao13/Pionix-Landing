@@ -674,3 +674,107 @@ document.querySelector('.splash-logo').addEventListener('click', function() {
         logo.style.filter = '';  // Restablecer el resplandor
     }, 500);
 });
+
+
+
+
+
+// ...al final del archivo...
+
+// --- Agenda Interactiva Pionix ---
+
+document.addEventListener('DOMContentLoaded', function() {
+    const horarios = [
+        "8:00am", "09:00am", "10:00am", "11:00am", "12:00pm",
+        "2:00pm", "3:00pm", "4:00pm", "5:00pm", "6:00pm"
+    ];
+
+    const fechaInput = document.getElementById('agenda-fecha');
+    const horaSelect = document.getElementById('agenda-hora');
+    const servicioSelect = document.getElementById('agenda-servicio');
+    const metodoSelect = document.getElementById('agenda-metodo');
+    const form = document.getElementById('agenda-form');
+    const msg = document.getElementById('agenda-msg');
+
+    // Set min date to today y valor inicial
+    if (fechaInput) {
+        const today = new Date();
+        const todayStr = today.toISOString().split('T')[0];
+        fechaInput.min = todayStr;
+        if (!fechaInput.value) fechaInput.value = todayStr;
+    }
+
+    // Función para actualizar las horas disponibles
+    function actualizarHoras() {
+        if (!horaSelect || !fechaInput.value) return;
+        let reservas = JSON.parse(localStorage.getItem('pionix_reservas') || '[]');
+        const ocupados = reservas.filter(r => r.fecha === fechaInput.value).map(r => r.hora);
+        horaSelect.innerHTML = '<option value="">Selecciona una hora</option>';
+        horarios.forEach(hora => {
+            const opt = document.createElement('option');
+            opt.value = hora;
+            opt.textContent = ocupados.includes(hora) ? `${hora} (Ocupado)` : hora;
+            opt.disabled = ocupados.includes(hora);
+            horaSelect.appendChild(opt);
+        });
+    }
+
+    // Actualizar horas al cargar, al cambiar fecha o servicio
+    if (fechaInput && horaSelect && servicioSelect) {
+        fechaInput.addEventListener('change', actualizarHoras);
+        servicioSelect.addEventListener('change', actualizarHoras);
+        actualizarHoras(); // Llenar al cargar
+    }
+
+    // Enviar reserva
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const servicio = servicioSelect.value;
+            const fecha = fechaInput.value;
+            const hora = horaSelect.value;
+            const nombre = document.getElementById('agenda-nombre').value.trim();
+            const contacto = document.getElementById('agenda-contacto').value.trim();
+            const metodo = metodoSelect ? metodoSelect.value : 'whatsapp';
+
+            if (!servicio || !fecha || !hora || !nombre || !contacto || !metodo) {
+                msg.textContent = "Por favor completa todos los campos.";
+                msg.style.color = "#ff4b7d";
+                return;
+            }
+
+            let reservas = JSON.parse(localStorage.getItem('pionix_reservas') || '[]');
+            if (reservas.some(r => r.fecha === fecha && r.hora === hora)) {
+                msg.textContent = "¡Ese horario ya está reservado! Elige otro.";
+                msg.style.color = "#ff4b7d";
+                return;
+            }
+
+            reservas.push({servicio, fecha, hora, nombre, contacto});
+            localStorage.setItem('pionix_reservas', JSON.stringify(reservas));
+
+            msg.textContent = "¡Reserva realizada con éxito! Te contactaremos pronto.";
+            msg.style.color = "var(--primary-cyan)";
+            form.reset();
+
+            // Volver a poner la fecha en hoy y actualizar horas
+            if (fechaInput) {
+                const today = new Date();
+                const todayStr = today.toISOString().split('T')[0];
+                fechaInput.value = todayStr;
+            }
+            actualizarHoras();
+
+            setTimeout(() => {
+                if (metodo === 'whatsapp') {
+                    const url = `https://wa.me/573185168709?text=Hola, soy ${encodeURIComponent(nombre)} y quiero reservar un ${encodeURIComponent(servicio)} para el ${fecha} a las ${hora}. Mi contacto: ${encodeURIComponent(contacto)}`;
+                    window.open(url, '_blank');
+                } else if (metodo === 'email') {
+                    const subject = encodeURIComponent(`Reserva de ${servicio} para ${fecha} a las ${hora}`);
+                    const body = encodeURIComponent(`Hola, soy ${nombre} y quiero reservar un ${servicio} para el ${fecha} a las ${hora}.\nMi contacto: ${contacto}`);
+                    window.open(`mailto:pionixcorp10@gmail.com?subject=${subject}&body=${body}`, '_blank');
+                }
+            }, 1200);
+        });
+    }
+});
