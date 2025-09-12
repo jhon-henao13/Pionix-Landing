@@ -435,7 +435,7 @@ body {
 
 .hero-description {
     font-size: 1.3rem;
-    font-weight: 400;
+    font-weight: 500;
     line-height: 1.8;
     margin: 0 auto 4rem auto;
     max-width: 700px;
@@ -1415,11 +1415,41 @@ body.menu-open .nav-overlay {
     }
 }
 
+
+
+@media (max-width: 522px) {
+    .hero {
+        min-height: 122vh;
+    }
+
+    .hero-title-main {
+        font-size: 3.5rem;
+    }
+
+    .agenda-form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .cta-button.large {
+        padding: 1rem 3rem;
+    }
+
+    .social-link {
+        width: 60px;
+        height: 60px;
+    }
+}
+
+
 @media (max-width: 480px) {
     .hero-title-main,
     .hero-title-sub {
-        font-size: 2rem;
+        font-size: 3rem;
     }
+
+
 
     .section-title {
         font-size: 2rem;
@@ -1455,5 +1485,44 @@ body.menu-open .nav-overlay {
 
 [data-aos="fade-left"] {
     transform: translateX(30px);
+}
+
+
+
+
+@media (max-width: 350px) {
+
+    .cta-button {
+        padding: 1.2rem 1.3rem;
+    }
+
+    .hero-description {
+        font-size: 1.4rem;
+    }
+
+    .hero-title-main {
+        font-size: 2.7rem;
+    }
+
+    .cta-button.large {
+        padding: 1rem 2rem;
+    }
+
+    .hero {
+        min-height: 126vh;
+    }
+
+}
+
+
+@media (max-width: 320px) {
+
+    .cta-button {
+        padding: 1.1rem 1rem;
+        font-size: 1rem;
+    }
+
+
+
 }
   
