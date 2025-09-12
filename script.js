@@ -23,31 +23,54 @@ function initializeNavigation() {
     const navMenu = document.getElementById('nav-menu');
     const navLinks = document.querySelectorAll('.nav-link');
     const navbar = document.querySelector('.navbar');
+    const navOverlay = document.getElementById('nav-overlay');
 
+    if (!navToggle || !navMenu) return; // defensa por si fallan los ids
+
+    // toggle click
     navToggle.addEventListener('click', function() {
-        navToggle.classList.toggle('active');
-        navMenu.classList.toggle('active');
-        
-        // Efecto de blur en el fondo
-        if (navMenu.classList.contains('active')) {
-            document.body.style.overflow = 'hidden';
-        } else {
-            document.body.style.overflow = 'auto';
-        }
+        const isActive = navToggle.classList.toggle('active');
+        navMenu.classList.toggle('active', isActive);
+
+        // bloquear scroll en body con clase (más robusto que manipular inline overflow)
+        document.body.classList.toggle('menu-open', isActive);
+
+        // accesibilidad
+        navToggle.setAttribute('aria-expanded', isActive ? 'true' : 'false');
+
+        if (navOverlay) navOverlay.addEventListener('click', () => {
+            navToggle.classList.remove('active');
+            navMenu.classList.remove('active');
+            document.body.classList.remove('menu-open');
+            navToggle.setAttribute('aria-expanded', 'false');
+        });
     });
 
+    // cerrar al clicar link
     navLinks.forEach(link => {
         link.addEventListener('click', function() {
             navToggle.classList.remove('active');
             navMenu.classList.remove('active');
-            document.body.style.overflow = 'auto';
+            document.body.classList.remove('menu-open');
+            navToggle.setAttribute('aria-expanded', 'false');
         });
     });
 
+    // esconder el menu si el usuario redimensiona más allá del breakpoint
+    window.addEventListener('resize', function() {
+        if (window.innerWidth > 768) {
+            navToggle.classList.remove('active');
+            navMenu.classList.remove('active');
+            document.body.classList.remove('menu-open');
+            navToggle.setAttribute('aria-expanded', 'false');
+        }
+    });
+
+    // comportamiento del navbar al hacer scroll (mantener tu lógica pero con defensas)
     let lastScrollY = window.scrollY;
     window.addEventListener('scroll', function() {
         const currentScrollY = window.scrollY;
-        
+
         if (currentScrollY > 100) {
             navbar.style.background = 'linear-gradient(180deg, rgba(0, 0, 0, 0.98) 0%, rgba(0, 0, 0, 0.95) 100%)';
             navbar.style.boxShadow = '0 8px 30px rgba(0, 255, 255, 0.15)';
@@ -63,10 +86,11 @@ function initializeNavigation() {
         } else {
             navbar.style.transform = 'translateY(0)';
         }
-        
+
         lastScrollY = currentScrollY;
     });
 }
+
 
 // Slider de Misión y Visión
 function initializeMisionVisionSlider() {
