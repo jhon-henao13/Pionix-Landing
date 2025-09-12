@@ -791,7 +791,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             setTimeout(() => {
                 if (metodo === 'whatsapp') {
-                    const url = `https://wa.me/573185168709?text=Hola, soy ${encodeURIComponent(nombre)} y quiero reservar un ${encodeURIComponent(servicio)} para el ${fecha} a las ${hora}. Mi contacto: ${encodeURIComponent(contacto)}`;
+                    const url = `https://wa.me/573023426062?text=Hola Pionix!, soy ${encodeURIComponent(nombre)} y quiero reservar un ${encodeURIComponent(servicio)} para el ${fecha} a las ${hora}. Mi contacto: ${encodeURIComponent(contacto)}`;
                     window.open(url, '_blank');
                 } else if (metodo === 'email') {
                     const subject = encodeURIComponent(`Reserva de ${servicio} para ${fecha} a las ${hora}`);
