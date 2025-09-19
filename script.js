@@ -730,18 +730,45 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Función para actualizar las horas disponibles
     function actualizarHoras() {
-        if (!horaSelect || !fechaInput.value) return;
-        let reservas = JSON.parse(localStorage.getItem('pionix_reservas') || '[]');
-        const ocupados = reservas.filter(r => r.fecha === fechaInput.value).map(r => r.hora);
-        horaSelect.innerHTML = '<option value="">Selecciona una hora</option>';
-        horarios.forEach(hora => {
-            const opt = document.createElement('option');
-            opt.value = hora;
-            opt.textContent = ocupados.includes(hora) ? `${hora} (Ocupado)` : hora;
-            opt.disabled = ocupados.includes(hora);
-            horaSelect.appendChild(opt);
-        });
-    }
+    if (!horaSelect || !fechaInput.value) return;
+    let reservas = JSON.parse(localStorage.getItem('pionix_reservas') || '[]');
+    const ocupados = reservas.filter(r => r.fecha === fechaInput.value).map(r => r.hora);
+    
+    horaSelect.innerHTML = '<option value="">Selecciona una hora</option>';
+    
+    horarios.forEach(hora => {
+        const opt = document.createElement('option');
+        opt.value = hora;
+        opt.textContent = ocupados.includes(hora) ? `${hora} (Ocupado)` : hora;
+        opt.disabled = ocupados.includes(hora);
+        horaSelect.appendChild(opt);
+    });
+
+    // Agregar opción "Otro..." manualmente
+    const otroOpt = document.createElement('option');
+    otroOpt.value = "otro";
+    otroOpt.textContent = "Otro...";
+    horaSelect.appendChild(otroOpt);
+}
+
+
+
+
+
+
+    // Mostrar/ocultar campo de hora personalizada
+    horaSelect.addEventListener('change', function() {
+        const customHoraInput = document.getElementById('agenda-hora-custom');
+        if (horaSelect.value === 'otro') {
+            customHoraInput.style.display = 'block';
+            customHoraInput.required = true;
+        } else {
+            customHoraInput.style.display = 'none';
+            customHoraInput.required = false;
+        }
+    });
+
+
 
     // Actualizar horas al cargar, al cambiar fecha o servicio
     if (fechaInput && horaSelect && servicioSelect) {
@@ -756,7 +783,11 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             const servicio = servicioSelect.value;
             const fecha = fechaInput.value;
-            const hora = horaSelect.value;
+            
+            const horaSeleccionada = horaSelect.value;
+            const horaPersonalizada = document.getElementById('agenda-hora-custom').value.trim();
+            const hora = (horaSeleccionada === 'otro') ? horaPersonalizada : horaSeleccionada;
+
             const nombre = document.getElementById('agenda-nombre').value.trim();
             const contacto = document.getElementById('agenda-contacto').value.trim();
             const metodo = metodoSelect ? metodoSelect.value : 'whatsapp';
@@ -766,6 +797,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 msg.style.color = "#ff4b7d";
                 return;
             }
+
+            if (horaSeleccionada === 'otro' && !/^(1[0-2]|0?[1-9]):[0-5][0-9](am|pm)$/i.test(horaPersonalizada)) {
+                msg.textContent = "Por favor ingresa una hora válida (ej. 7:30pm)";
+                msg.style.color = "#ff4b7d";
+                return;
+            }
+
 
             let reservas = JSON.parse(localStorage.getItem('pionix_reservas') || '[]');
             if (reservas.some(r => r.fecha === fecha && r.hora === hora)) {
