@@ -720,6 +720,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('agenda-form');
     const msg = document.getElementById('agenda-msg');
 
+    const calendarLinkDiv = document.getElementById('agenda-calendar-link');
+
+
     // Set min date to today y valor inicial
     if (fechaInput) {
         const today = new Date();
@@ -777,9 +780,36 @@ document.addEventListener('DOMContentLoaded', function() {
         actualizarHoras(); // Llenar al cargar
     }
 
+
+    // Función para crear el link de Google Calendar
+    function crearEnlaceGoogleCalendar({nombre, servicio, fecha, hora, contacto}) {
+        let [h, min, ampm] = hora.match(/(\d{1,2}):(\d{2})(am|pm)/i) || [];
+        if (!h) {
+            h = "08"; min = "00"; ampm = "am";
+        }
+        h = parseInt(h, 10);
+        if (ampm && ampm.toLowerCase() === 'pm' && h < 12) h += 12;
+        if (ampm && ampm.toLowerCase() === 'am' && h === 12) h = 0;
+        const [year, month, day] = fecha.split('-');
+        const start = `${year}${month}${day}T${String(h).padStart(2,'0')}${min}00`;
+        let hFin = h + 1;
+        if (hFin > 23) hFin = 23;
+        const end = `${year}${month}${day}T${String(hFin).padStart(2,'0')}${min}00`;
+
+        const text = encodeURIComponent(`Reserva Pionix - ${nombre}`);
+        const details = encodeURIComponent(`Servicio: ${servicio}\nContacto: ${contacto}`);
+        return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${text}&dates=${start}/${end}&details=${details}`;
+    }
+
+
+
     // Enviar reserva
     if (form) {
         form.addEventListener('submit', function(e) {
+
+            if (calendarLinkDiv) calendarLinkDiv.innerHTML = "";
+
+
             e.preventDefault();
             const servicio = servicioSelect.value;
             const fecha = fechaInput.value;
@@ -817,7 +847,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
             msg.textContent = "¡Reserva realizada con éxito! Te contactaremos pronto.";
             msg.style.color = "var(--primary-cyan)";
+            
+
+            // Generar y mostrar el link de Google Calendar
+            const calendarUrl = crearEnlaceGoogleCalendar({nombre, servicio, fecha, hora, contacto});
+            if (calendarLinkDiv) {
+                calendarLinkDiv.innerHTML = `<a href="${calendarUrl}" target="_blank" class="cta-button secondary" style="margin-top:1rem;display:inline-block;">&#128197; Agregar a Google Calendar</a>`;
+            }
+
             form.reset();
+
 
             // Volver a poner la fecha en hoy y actualizar horas
             if (fechaInput) {
@@ -829,7 +868,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
             setTimeout(() => {
                 if (metodo === 'whatsapp') {
-                    const url = `https://wa.me/573023426062?text=Hola Pionix!, soy ${encodeURIComponent(nombre)} y quiero reservar un ${encodeURIComponent(servicio)} para el ${fecha} a las ${hora}. Mi contacto: ${encodeURIComponent(contacto)}`;
+                    const url = `https://wa.me/573023426062?text=Hola Pionix!, soy ${encodeURIComponent(nombre)} y quiero reservar un ${encodeURIComponent(servicio)} para el ${fecha} a las ${hora}. Mi contacto: ${encodeURIComponent(contacto)}. Puedes guardar esta cita en tu calendario aquí: ${encodeURIComponent(calendarUrl)}`;
+
                     window.open(url, '_blank');
                 } else if (metodo === 'email') {
                     const subject = encodeURIComponent(`Reserva de ${servicio} para ${fecha} a las ${hora}`);
