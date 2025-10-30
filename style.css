@@ -433,6 +433,12 @@ body {
     }
 }
 
+
+
+
+
+
+
 .hero-description {
     font-size: 1.3rem;
     font-weight: 500;
@@ -478,6 +484,14 @@ body {
     border: 2px solid transparent;
     box-shadow: var(--shadow-deep);
 }
+
+
+.btn-reservar {
+    display: flex;
+    justify-content: center;
+}
+
+
 
 .cta-button.primary {
     background: var(--gradient-secondary);
@@ -730,11 +744,45 @@ body {
 }
 
 .services-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    /* display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); */
+    display: flex;
+    flex-direction: column;
+
+
     gap: 2rem;
     margin-top: 3rem;
 }
+
+
+.service-card-div {
+    display: flex;
+    flex-direction: row;
+}
+
+.img-evento {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 80%;
+}
+
+.img-evento img:hover {
+    transform: translateY(-10px);
+    border-color: var(--primary-cyan);
+    box-shadow: var(--glow-cyan);
+    transition: 0.3 ease;
+}
+
+.img-evento img {
+    opacity: 1 !important;
+    transform: scale(0.9);
+    filter: brightness(1) saturate(1.4) !important;
+    transition: 0.8s;
+    width: 75%;
+    border-radius: 20px;
+}
+
 
 .service-card {
     background: rgba(255, 255, 255, 0.05);
@@ -774,6 +822,7 @@ body {
 .service-card p {
     color: var(--light-gray);
     line-height: 1.6;
+    font-size: 20px;
 }
 
 /* Benefits Section */
@@ -825,6 +874,7 @@ body {
     color: var(--light-gray);
     line-height: 1.6;
 }
+
 
 /* Testimonials Section */
 .testimonials {
@@ -1047,10 +1097,6 @@ body {
 
 
 
-
-
-
-
 /* Contact Section */
 .contact {
     padding: 100px 0;
@@ -1067,7 +1113,10 @@ body {
 
 .contact-info {
     display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
     gap: 2rem;
+    width: 100%;
+    
 }
 
 .contact-item {
@@ -1106,6 +1155,8 @@ body {
 .contact-details p {
     color: var(--light-gray);
     margin-bottom: 0.5rem;
+    font-size: 20px;
+    font-weight: 600;
 }
 
 .contact-link {
