@@ -562,100 +562,77 @@ body {
     0% { border-color: var(--primary-cyan); box-shadow: var(--glow-cyan); }
     100% { border-color: var(--primary-purple); box-shadow: var(--glow-purple); }
 }
-/* Splash Loader */
+
+/* === SPLASH LOADER FUTURISTA === */
 #splash-loader {
     position: fixed;
+    inset: 0;
     z-index: 9999;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-direction: column;
-    background: #1c1c1c;  /* Fondo oscuro y sutil */
-    opacity: 1;
-    visibility: visible;
-    transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out;
-}
-
-/* Aseguramos que el loader tenga suficiente espacio y el contenido centrado */
-.splash-content {
-    text-align: center;
-    animation: none; /* No queremos una animación de desvanecimiento */
-}
-
-/* Estilos del logo */
-.splash-logo {
-    width: 150px;
-    height: 150px;
+    background: radial-gradient(circle at center, #030b15, #000);
+    transition: opacity 1s ease, visibility 1s ease;
+  }
+  
+  .splash-ring {
+    position: absolute;
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    border: 5px solid transparent;
+    border-top-color: var(--primary-cyan);
+    border-right-color: var(--primary-purple);
+    animation: spinRing 2s linear infinite;
+    filter: drop-shadow(0 0 15px var(--primary-cyan));
+  }
+  
+  @keyframes spinRing {
+    to { transform: rotate(360deg); }
+  }
+  
+  .splash-logo {
+    width: 110px;
+    height: 110px;
     border-radius: 50%;
     object-fit: cover;
-    filter: drop-shadow(0 0 15px rgba(0, 255, 255, 0.7));  /* Resplandor suave */
-    margin-bottom: 1.5rem;
-    border: 4px solid var(--primary-cyan);  /* Borde luminoso */
-    cursor: pointer;  /* Hacer el logo interactivo */
-    transition: transform 0.3s ease, filter 0.3s ease; /* Transición suave al interactuar */
-}
-
-/* Efecto de rotación del logo */
-@keyframes logoRotate {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-/* Animación de flotación del logo */
-@keyframes logoFloat {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-10px); }
-}
-
-/* Efecto de resplandor del logo */
-@keyframes logoGlow {
-    0% { filter: drop-shadow(0 0 8px #00ffff); }
-    50% { filter: drop-shadow(0 0 30px #8A2BE2); }
-    100% { filter: drop-shadow(0 0 8px #00ffff); }
-}
-
-/* Estilos para el texto de carga */
-.splash-text {
-    font-size: 1.5rem;
+    border: 3px solid rgba(0, 255, 255, 0.6);
+    box-shadow: 0 0 25px rgba(0, 255, 255, 0.5);
+    animation: logoPop 2s ease infinite alternate;
+  }
+  
+  @keyframes logoPop {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+  }
+  
+  .splash-text {
+    margin-top: 1.2rem;
+    font-size: 1.3rem;
     font-weight: 500;
     color: var(--white);
-    text-shadow: 0 0 10px var(--primary-cyan);  /* Sutil resplandor en el texto */
-    font-family: 'Inter', sans-serif;
-    white-space: nowrap;
-    overflow: hidden;
-    border-right: 3px solid var(--primary-cyan);  /* Efecto de tipeo */
-    width: 0;
-    animation: typing 3s steps(30, end) 0.5s forwards;  /* Animación de escritura */
-}
-
-/* Animación de tipeo */
-@keyframes typing {
-    from { width: 0 }
-    to { width: 240px; }
-}
-
-/* Efecto de desvanecimiento (opcional, pero no lo aplicamos ahora) */
-@keyframes fadeIn {
-    from { opacity: 0 }
-    to { opacity: 1 }
-}
-
-/* Efectos interactivos al hacer clic en el logo */
-.splash-logo:hover {
-    transform: scale(1.1); /* Ampliar el logo al pasar el mouse */
-    filter: drop-shadow(0 0 25px var(--primary-cyan));  /* Aumentar el resplandor */
-    transition: transform 0.3s, filter 0.3s;  /* Transiciones suaves */
-}
-
-/* Opcional: Añadir una transición para ocultar el loader con un fondo oscuro más sutil */
-#splash-loader.hidden {
+    letter-spacing: 1px;
+    text-shadow: 0 0 10px var(--primary-cyan);
+  }
+  
+  .dots::after {
+    content: '';
+    animation: dots 1.5s steps(3, end) infinite;
+  }
+  
+  @keyframes dots {
+    0% { content: ''; }
+    33% { content: '.'; }
+    66% { content: '..'; }
+    100% { content: '...'; }
+  }
+  
+  /* Ocultar loader */
+  #splash-loader.hidden {
     opacity: 0;
     visibility: hidden;
-}
+  }
 
 
 
@@ -1527,7 +1504,55 @@ body.menu-open .nav-overlay {
     opacity: 1 !important;
 }
 
+
+
 /* Responsive Design */
+
+/* === HERO RESPONSIVE === */
+@media (max-width: 992px) {
+    .hero-title-main, .hero-title-sub {
+      font-size: 3rem;
+      line-height: 1.2;
+    }
+    .hero-description {
+      font-size: 1.1rem;
+      padding: 0 1rem;
+    }
+    .hero-stats {
+      flex-direction: column;
+      gap: 1rem;
+      top: 100%;
+    }
+    .stat-item {
+      width: 90%;
+    }
+  }
+  
+  @media (max-width: 600px) {
+    .hero {
+      min-height: 110vh;
+      padding-top: 6rem;
+    }
+    .hero-title-main, .hero-title-sub {
+      font-size: 2.2rem;
+      letter-spacing: -1px;
+    }
+    .hero-description {
+      font-size: 1rem;
+    }
+    .cta-button {
+      font-size: 1rem;
+      padding: 1rem 1.8rem;
+    }
+    .scroll-arrow {
+      width: 30px;
+      height: 30px;
+    }
+  }
+  
+
+
+
 @media (max-width: 768px) {
     .nav-menu {
         /* position: fixed;

@@ -677,13 +677,14 @@ document.head.appendChild(dynamicStyles);
 
 
 // Función para ocultar el splash loader una vez cargada la página
-window.addEventListener('load', function() {
-    setTimeout(function() {
-        const splashLoader = document.getElementById('splash-loader');
-        if (splashLoader) {
-            splashLoader.classList.add('hidden');  // Añadimos una clase para ocultarlo suavemente
-        }
-    }, 1100);  // Espera un poco más para que se vea el logo y el texto
+// === LOADER FUTURISTA ===
+window.addEventListener("load", () => {
+    const splash = document.getElementById("splash-loader");
+    if (!splash) return;
+    
+    setTimeout(() => {
+        splash.classList.add("hidden"); // se desvanece con transición CSS
+    }, 1300); // un poco más de tiempo para que se vea la animación
 });
 
 // Hacer que el logo sea interactivo al hacer clic
