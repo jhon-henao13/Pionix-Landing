@@ -701,10 +701,6 @@ document.querySelector('.splash-logo').addEventListener('click', function() {
 
 
 
-
-import supabase from './firebase-config.js';
-// ...al final del archivo...
-
 // --- Agenda Interactiva Pionix ---
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -719,9 +715,15 @@ document.addEventListener('DOMContentLoaded', function() {
     const metodoSelect = document.getElementById('agenda-metodo');
     const form = document.getElementById('agenda-form');
     const msg = document.getElementById('agenda-msg');
-
     const calendarLinkDiv = document.getElementById('agenda-calendar-link');
 
+    // Acceder a Supabase desde window (ya inicializado en firebase-config.js)
+    const supabase = window.supabaseClient;
+
+    if (!supabase) {
+        console.error('Supabase no está inicializado correctamente');
+        return;
+    }
 
     // Set min date to today y valor inicial
     if (fechaInput) {
@@ -731,56 +733,59 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!fechaInput.value) fechaInput.value = todayStr;
     }
 
-    
+    // Función para actualizar horas disponibles desde Supabase
     async function actualizarHoras() {
         if (!horaSelect || !fechaInput.value) return;
 
-        const { data: reservas, error } = await supabase
-            .from('reservas')
-            .select('hora')
-            .eq('fecha', fechaInput.value);
+        try {
+            // Obtener reservas del día seleccionado
+            const { data: reservas, error } = await supabase
+                .from('reservas')
+                .select('hora')
+                .eq('fecha', fechaInput.value);
 
-        if (error) {
-            console.error('Error al obtener reservas:', error);
-            return;
+            if (error) {
+                console.error('Error al obtener reservas:', error);
+                return;
+            }
+
+            // Extraer horas ocupadas
+            const ocupados = reservas ? reservas.map(r => r.hora) : [];
+
+            // Llenar el select de horas
+            horaSelect.innerHTML = '<option value="">Selecciona una hora</option>';
+
+            horarios.forEach(hora => {
+                const opt = document.createElement('option');
+                opt.value = hora;
+                opt.textContent = ocupados.includes(hora) ? `${hora} (Ocupado)` : hora;
+                opt.disabled = ocupados.includes(hora);
+                horaSelect.appendChild(opt);
+            });
+
+            // Opción para otra hora personalizada
+            const otroOpt = document.createElement('option');
+            otroOpt.value = 'otro';
+            otroOpt.textContent = 'Otra hora...';
+            horaSelect.appendChild(otroOpt);
+        } catch (error) {
+            console.error('Error en actualizarHoras:', error);
         }
-
-        const ocupados = reservas.map(r => r.hora);
-
-        horaSelect.innerHTML = '<option value="">Selecciona una hora</option>';
-
-        horarios.forEach(hora => {
-            const opt = document.createElement('option');
-            opt.value = hora;
-            opt.textContent = ocupados.includes(hora) ? `${hora} (Ocupado)` : hora;
-            opt.disabled = ocupados.includes(hora);
-            horaSelect.appendChild(opt);
-        });
-
-        const otroOpt = document.createElement('option');
-        otroOpt.value = 'otro';
-        otroOpt.textContent = 'Otra hora...';
-        horaSelect.appendChild(otroOpt);
     }
 
-
-
-
-
-
     // Mostrar/ocultar campo de hora personalizada
-    horaSelect.addEventListener('change', function() {
-        const customHoraInput = document.getElementById('agenda-hora-custom');
-        if (horaSelect.value === 'otro') {
-            customHoraInput.style.display = 'block';
-            customHoraInput.required = true;
-        } else {
-            customHoraInput.style.display = 'none';
-            customHoraInput.required = false;
-        }
-    });
-
-
+    if (horaSelect) {
+        horaSelect.addEventListener('change', function() {
+            const customHoraInput = document.getElementById('agenda-hora-custom');
+            if (this.value === 'otro') {
+                customHoraInput.style.display = 'block';
+                customHoraInput.required = true;
+            } else {
+                customHoraInput.style.display = 'none';
+                customHoraInput.required = false;
+            }
+        });
+    }
 
     // Actualizar horas al cargar, al cambiar fecha o servicio
     if (fechaInput && horaSelect && servicioSelect) {
@@ -788,7 +793,6 @@ document.addEventListener('DOMContentLoaded', function() {
         servicioSelect.addEventListener('change', actualizarHoras);
         actualizarHoras(); // Llenar al cargar
     }
-
 
     // Función para crear el link de Google Calendar
     function crearEnlaceGoogleCalendar({nombre, servicio, fecha, hora, contacto}) {
@@ -810,9 +814,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${text}&dates=${start}/${end}&details=${details}`;
     }
 
-
-
-    // Enviar reserva a Supabase
+    // Función para enviar reserva a Supabase
     async function enviarReserva() {
         const servicio = servicioSelect.value;
         const fecha = fechaInput.value;
@@ -821,72 +823,107 @@ document.addEventListener('DOMContentLoaded', function() {
         const hora = (horaSeleccionada === 'otro') ? horaPersonalizada : horaSeleccionada;
         const nombre = document.getElementById('agenda-nombre').value.trim();
         const contacto = document.getElementById('agenda-contacto').value.trim();
-        const metodo = metodoSelect.value;
+        const metodo = metodoSelect ? metodoSelect.value : 'whatsapp';
 
+        // Validar campos
         if (!servicio || !fecha || !hora || !nombre || !contacto || !metodo) {
             msg.textContent = "Por favor completa todos los campos.";
             msg.style.color = "#ff4b7d";
             return;
         }
 
-        // Verificar si el horario ya está ocupado
-        const { data: ocupados, error } = await supabase
-            .from('reservas')
-            .select('hora')
-            .eq('fecha', fecha)
-            .eq('hora', hora);
+        try {
+            // Verificar si el horario ya está ocupado
+            const { data: ocupados, error: errorCheck } = await supabase
+                .from('reservas')
+                .select('id')
+                .eq('fecha', fecha)
+                .eq('hora', hora);
 
-        if (error) {
-            console.error("Error al verificar reservas:", error);
-            return;
-        }
+            if (errorCheck) {
+                console.error("Error al verificar reservas:", errorCheck);
+                msg.textContent = "Error al procesar la reserva. Intenta nuevamente.";
+                msg.style.color = "#ff4b7d";
+                return;
+            }
 
-        if (ocupados.length > 0) {
-            msg.textContent = "¡Ese horario ya está reservado! Elige otro.";
+            if (ocupados && ocupados.length > 0) {
+                msg.textContent = "¡Ese horario ya está reservado! Elige otro.";
+                msg.style.color = "#ff4b7d";
+                actualizarHoras(); // Actualizar la lista
+                return;
+            }
+
+            // Guardar reserva en Supabase
+            const { data, error: errorInsert } = await supabase
+                .from('reservas')
+                .insert([
+                    { 
+                        servicio, 
+                        fecha, 
+                        hora, 
+                        nombre, 
+                        contacto, 
+                        metodo,
+                        created_at: new Date().toISOString()
+                    }
+                ]);
+
+            if (errorInsert) {
+                console.error("Error al guardar reserva:", errorInsert);
+                msg.textContent = "Error al realizar la reserva. Intenta nuevamente.";
+                msg.style.color = "#ff4b7d";
+                return;
+            }
+
+            // Mostrar mensaje de éxito
+            msg.textContent = "¡Reserva realizada con éxito! Te contactaremos pronto.";
+            msg.style.color = "var(--primary-cyan)";
+
+            // Generar y mostrar link de Google Calendar
+            const calendarUrl = crearEnlaceGoogleCalendar({ nombre, servicio, fecha, hora, contacto });
+            if (calendarLinkDiv) {
+                calendarLinkDiv.innerHTML = `<a href="${calendarUrl}" target="_blank" class="cta-button secondary" style="margin-top:1rem;display:inline-block;">&#128197; Agregar a Google Calendar</a>`;
+            }
+
+            // Limpiar formulario
+            form.reset();
+            if (calendarLinkDiv) calendarLinkDiv.innerHTML = '';
+
+            // Volver a poner la fecha en hoy
+            if (fechaInput) {
+                const today = new Date();
+                const todayStr = today.toISOString().split('T')[0];
+                fechaInput.value = todayStr;
+            }
+            
+            // Actualizar horas disponibles
+            actualizarHoras();
+
+            // Enviar por WhatsApp después de 1.2 segundos
+            setTimeout(() => {
+                if (metodo === 'whatsapp') {
+                    const url = `https://wa.me/573023426062?text=Hola, soy ${encodeURIComponent(nombre)} y quiero reservar un ${encodeURIComponent(servicio)} para el ${fecha} a las ${hora}. Mi contacto: ${encodeURIComponent(contacto)}`;
+                    window.open(url, '_blank');
+                } else if (metodo === 'email') {
+                    const subject = encodeURIComponent(`Reserva de ${servicio} para ${fecha} a las ${hora}`);
+                    const body = encodeURIComponent(`Hola, soy ${nombre} y quiero reservar un ${servicio} para el ${fecha} a las ${hora}.\nMi contacto: ${contacto}`);
+                    window.open(`mailto:pionixcorp10@gmail.com?subject=${subject}&body=${body}`, '_blank');
+                }
+            }, 1200);
+
+        } catch (error) {
+            console.error('Error en enviarReserva:', error);
+            msg.textContent = "Error inesperado. Intenta nuevamente.";
             msg.style.color = "#ff4b7d";
-            return;
         }
-
-        // Guardar reserva en Supabase
-        const { data, errorInsert } = await supabase
-            .from('reservas')
-            .insert([
-                { servicio, fecha, hora, nombre, contacto, metodo }
-            ]);
-
-        if (errorInsert) {
-            console.error("Error al guardar reserva:", errorInsert);
-            msg.textContent = "Error al realizar la reserva. Intenta nuevamente.";
-            msg.style.color = "#ff4b7d";
-            return;
-        }
-
-        msg.textContent = "¡Reserva realizada con éxito! Te contactaremos pronto.";
-        msg.style.color = "var(--primary-cyan)";
-
-        // Mostrar link de Google Calendar
-        const calendarUrl = crearEnlaceGoogleCalendar({ nombre, servicio, fecha, hora, contacto });
-        if (calendarLinkDiv) {
-            calendarLinkDiv.innerHTML = `<a href="${calendarUrl}" target="_blank" class="cta-button secondary" style="margin-top:1rem;display:inline-block;">&#128197; Agregar a Google Calendar</a>`;
-        }
-
-        form.reset();
-
-        // Volver a poner la fecha en hoy y actualizar horas
-        if (fechaInput) {
-            const today = new Date();
-            const todayStr = today.toISOString().split('T')[0];
-            fechaInput.value = todayStr;
-        }
-        actualizarHoras();
     }
 
-    // Función de submit del formulario
+    // Submit del formulario
     if (form) {
         form.addEventListener('submit', function(e) {
             e.preventDefault();
             enviarReserva();
         });
     }
-
 });
