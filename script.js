@@ -702,7 +702,7 @@ document.querySelector('.splash-logo').addEventListener('click', function() {
 
 
 
-
+import supabase from './firebase-config.js';
 // ...al final del archivo...
 
 // --- Agenda Interactiva Pionix ---
